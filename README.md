@@ -11,15 +11,13 @@ Se han completado todas las tareas solicitadas de la **Práctica 5** para la asi
 
 ## 🛠️ Librerías Utilizadas
 
-[![OpenCV](https://img.shields.io/badge/OpenCV-%23FD8C00?style=for-the-badge&logo=opencv)](Link_To_Your_OpenCV_Page)
-[![Matplotlib](https://img.shields.io/badge/Matplotlib-%43FF6400?style=for-the-badge&logo=matplotlib&logoColor=white)](Link_To_Your_Matplotlib_Page)
-[![Imutils](https://img.shields.io/badge/Imutils-%230077b5?style=for-the-badge&logo=python&logoColor=white)](Link_To_Your_Imutils_Page)
-[![MTCNN](https://img.shields.io/badge/MTCNN-%234D4DFF?style=for-the-badge&logo=tensorflow&logoColor=white)](Link_To_Your_MTCNN_Page)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-%23FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](Link_To_Your_TensorFlow_Page)
-[![DeepFace](https://img.shields.io/badge/DeepFace-%234B8BBE?style=for-the-badge&logo=deepface&logoColor=white)](Link_To_Your_DeepFace_Page)
-[![tf-keras](https://img.shields.io/badge/tf--keras-%23D00000?style=for-the-badge&logo=tensorflow&logoColor=white)](Link_To_Your_tf-keras_Page)
-[![CMake](https://img.shields.io/badge/CMake-%23008CC1?style=for-the-badge&logo=cmake&logoColor=white)](Link_To_Your_CMake_Page)
-
+[![OpenCV](https://img.shields.io/badge/OpenCV-%23FD8C00?style=for-the-badge&logo=opencv)](https://opencv.org/)
+[![MediaPipe](https://img.shields.io/badge/MediaPipe-%2300B6AB?style=for-the-badge&logo=mediapipe)](https://mediapipe.dev/)
+[![NumPy](https://img.shields.io/badge/NumPy-%2300A9E0?style=for-the-badge&logo=numpy&logoColor=white)](https://numpy.org/)
+[![Math](https://img.shields.io/badge/Math-%23F0B800?style=for-the-badge&logo=mathworks&logoColor=white)](https://www.mathworks.com/)
+[![Random](https://img.shields.io/badge/Random-%23FF5733?style=for-the-badge&logo=python&logoColor=white)](https://docs.python.org/3/library/random.html)
+[![Time](https://img.shields.io/badge/Time-%23FF6347?style=for-the-badge&logo=python&logoColor=white)](https://docs.python.org/3/library/time.html)
+[![BaseOptions](https://img.shields.io/badge/BaseOptions-%23007A99?style=for-the-badge&logo=python&logoColor=white)](https://mediapipe.dev/)
 
 
 ---
