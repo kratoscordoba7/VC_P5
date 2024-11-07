@@ -133,9 +133,9 @@ with mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence
 ```
 
 Este código muestra cómo procesar los frames tras la segmentación, utilizando la conversión de los mismos a formato RGB y luego pasándolos al segmentador para obtener los resultados de forma asíncrona.
-
-<img src="images/duende_adicional.gif">
-
+<div align="center">
+   <img  width="400px" src="images/duende_adicional.gif" >
+</div>
 
 
 ---
