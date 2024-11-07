@@ -116,7 +116,7 @@ segmenter = vision.ImageSegmenter.create_from_options(options)
 
 Por último, la forma de procesar los frames a partir de la segmentación es la siguiente:
 
-```
+```python
 # Creamos el FaceMesh y procesamos los frames
 with mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5) as face_mesh:
     while cap.isOpened():
