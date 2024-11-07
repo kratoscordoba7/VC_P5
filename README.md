@@ -54,6 +54,11 @@ Tras estos pasos debería poder ejecutar el proyecto localmente
 Tras mostrar opciones para la detección y extracción de información de caras humanas con deepface, la tarea a entregar consiste en proponer un escenario de aplicación y desarrollar un prototipo de temática libre que provoque reacciones a partir de la información extraida del rostro. Los detectores proporcionan información del rostro, y de sus elementos faciales. Ideas inmediatas pueden ser filtros, aunque no hay limitaciones en este sentido. La entrega debe venir acompañada de un gif animado o vídeo de un máximo de 30 segundos con momentos seleccionados de la propuesta.
 
 
+> [!IMPORTANT]  
+> Optamos por usar MediaPipe debido a que es una biblioteca que ofrece una amplia variedad de funcionalidades y alta calidad en sus resultados. Demostró ser la mejor opción para nuestras necesidades.
+
+
+
 ### Modo Duende
 
 Cuando abrimos la boca, se genera una caída de dinero, la cual representamos mediante una clase que gestiona las coordenadas x e y y asigna un tiempo de expiración para determinar si el objeto sigue descendiendo o desaparece. A continuación, se muestra un fragmento de código que ilustra cómo se implementa este comportamiento:
@@ -133,10 +138,13 @@ with mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence
 ```
 
 Este código muestra cómo procesar los frames tras la segmentación, utilizando la conversión de los mismos a formato RGB y luego pasándolos al segmentador para obtener los resultados de forma asíncrona.
+
 <div align="center">
    <img  width="400px" src="images/duende_adicional.gif" >
 </div>
 
+> [!TIP]  
+> MediaPipe ofrece una gran variedad de funcionalidades, desde la detección de rostros hasta la segmentación y mucho más, lo que permite explorar y crear distintos modos animados de filtros para pasar un rato divertido.
 
 ---
 
