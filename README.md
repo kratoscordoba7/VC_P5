@@ -49,14 +49,16 @@ Tras estos pasos debería poder ejecutar el proyecto localmente
 
 <h2 align="center">📋 Tareas</h2>
 
-### Tarea 1 Detectores faciales y filtros
+### Tarea 1: Detectores Faciales y Filtros
 
-Tras mostrar opciones para la detección y extracción de información de caras humanas con deepface, la tarea a entregar consiste en proponer un escenario de aplicación y desarrollar un prototipo de temática libre que provoque reacciones a partir de la información extraida del rostro. Los detectores proporcionan información del rostro, y de sus elementos faciales. Ideas inmediatas pueden ser filtros, aunque no hay limitaciones en este sentido. La entrega debe venir acompañada de un gif animado o vídeo de un máximo de 30 segundos con momentos seleccionados de la propuesta.
+Hemos diseñado filtros que se activan cuando el usuario abre la boca. Usando el teclado:
+
+- Modo 1 -> "Hamburguesa", aparecen hamburguesas alrededor de la persona;
+- Modo 2 -> "Duende", comienza a llover dinero sobre el usuario.
 
 
 > [!IMPORTANT]  
-> Optamos por usar MediaPipe debido a que es una biblioteca que ofrece una amplia variedad de funcionalidades y alta calidad en sus resultados. Demostró ser la mejor opción para nuestras necesidades.
-
+> Optamos por usar MediaPipe debido a que es una biblioteca que ofrece una amplia variedad de funcionalidades y alta calidad en sus resultados. Demostró ser la mejor opción para nuestras necesidades. Uno de los factores clave por los que optamos por MediaPipe es la malla de puntos faciales que proporciona, lo que facilita enormemente la interacción y el seguimiento preciso del rostro.
 
 
 ### Modo Duende
@@ -101,6 +103,33 @@ Para detectar cuándo debe aparecer el dinero, basta con establecer un umbral de
  # Eliminamos segun va pasando el tiempo de vida
  falling_emoji[:] = [emoji for emoji in falling_emoji if emoji.update()]
 ```
+
+En el modo duende, el tamaño de las orejas varía en función de la distancia del rostro a la cámara: cuanto más cerca esté, mayor será el tamaño de las orejas. Cada oreja se representa mediante una imagen, y tanto su tamaño como su posición se ajustan en función de la ubicación del rostro.
+
+```python
+# Posicionamos las orejas (puntos 234 y 454 para las orejas izquierda y derecha)
+if 234 in points_data:
+    left_ear_position = points_data[234]
+    left_ear_resized = cv2.resize(left_ear_img, (100, 100))  # Ajustamos el tamaño de la oreja izquierda
+    lx, ly = left_ear_position['x'], left_ear_position['y']
+
+    # Ajustes de posición vertical y horizontal
+    lx -= 80  
+    ly -= 60 
+
+# Más abajo en el código...
+
+if 454 in points_data:
+    right_ear_position = points_data[454]
+    right_ear_resized = cv2.resize(right_ear_img, (100, 100))  # Ajustamos el tamaño de la oreja derecha
+    rx, ry = right_ear_position['x'], right_ear_position['y']
+
+    # Ajustes de posición para la oreja derecha
+    rx -= 15  
+    ry -= 60 
+```
+
+Este fragmento de código muestra cómo posicionar las orejas en función de los puntos clave del rostro, con ajustes en el tamaño y la posición para lograr un efecto realista.
 
 ### Modo duende adicional(segmentación)
 
