@@ -97,7 +97,7 @@ Para detectar cuándo debe aparecer el dinero, basta con establecer un umbral de
  falling_emoji[:] = [emoji for emoji in falling_emoji if emoji.update()]
 ```
 
-### Modo duende adicional(segmentacion)
+### Modo duende adicional(segmentación)
 
 En este caso, el funcionamiento es similar al modo duende anterior, pero se le añade segmentación para que el fondo desaparezca y sea reemplazado por una imagen. Esto amplía el uso de MediaPipe, explorando sus diversas funcionalidades. Para la segmentación, utilizamos un modelo que MediaPipe proporciona en su documentación, el cual nos ayudará a segmentar lo que se reproduce a través de la cámara en vivo.
 
