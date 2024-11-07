@@ -26,7 +26,7 @@ Se han completado todas las tareas solicitadas de la **Práctica 5** para la asi
 Para comenzar con el proyecto, sigue estos pasos:
 
 > [!NOTE]  
-> Debes de situarte en un environment configurado como se definió en el cuaderno de la práctica 1  de [otsedom](https://github.com/otsedom/otsedom.github.io/blob/main/VC/P1/README.md#111-comandos-basicos-de-anaconda) y la práctica 5 de [otsedom](https://github.com/otsedom/otsedom.github.io/blob/main/VC/P5/README.md).
+> Debes de situarte en un environment configurado como se definió en el cuaderno de la práctica 1  de [otsedom](https://github.com/otsedom/otsedom.github.io/blob/main/VC/P1/README.md#111-comandos-basicos-de-anaconda). Además, es necesario instalar la biblioteca de MediaPipe.
 
 ### Paso 1: Abrir VSCode y situarse en el directorio:
    
@@ -49,10 +49,131 @@ Tras estos pasos debería poder ejecutar el proyecto localmente
 
 <h2 align="center">📋 Tareas</h2>
 
-### Tarea 1 Detectores faciales y filtros
+### Tarea 1: Detectores Faciales y Filtros
 
-Tras mostrar opciones para la detección y extracción de información de caras humanas con deepface, la tarea a entregar consiste en proponer un escenario de aplicación y desarrollar un prototipo de temática libre que provoque reacciones a partir de la información extraida del rostro. Los detectores proporcionan información del rostro, y de sus elementos faciales. Ideas inmediatas pueden ser filtros, aunque no hay limitaciones en este sentido. La entrega debe venir acompañada de un gif animado o vídeo de un máximo de 30 segundos con momentos seleccionados de la propuesta.
+Hemos diseñado filtros que se activan cuando el usuario abre la boca. Usando el teclado:
 
+- Modo 1 -> "Hamburguesa", aparecen hamburguesas alrededor de la persona;
+- Modo 2 -> "Duende", comienza a llover dinero sobre el usuario.
+
+
+> [!IMPORTANT]  
+> Optamos por usar MediaPipe debido a que es una biblioteca que ofrece una amplia variedad de funcionalidades y alta calidad en sus resultados. Demostró ser la mejor opción para nuestras necesidades. Uno de los factores clave por los que optamos por MediaPipe es la malla de puntos faciales que proporciona, lo que facilita enormemente la interacción y el seguimiento preciso del rostro.
+
+
+### Modo Duende
+
+Cuando abrimos la boca, se genera una caída de dinero, la cual representamos mediante una clase que gestiona las coordenadas x e y y asigna un tiempo de expiración para determinar si el objeto sigue descendiendo o desaparece. A continuación, se muestra un fragmento de código que ilustra cómo se implementa este comportamiento:
+
+``` python
+# Clase para el dinero
+class FallingEmoji:
+    def __init__(self, x, y, speed, time_to_live):
+        self.x = x
+        self.y = y
+        self.speed = speed
+        self.time_to_live = time_to_live  # Tiempo de vida del emoji
+        self.creation_time = time.time()  # Momento en que se creó el emoji
+
+    def update(self):
+        self.y += self.speed  # Movimiento hacia abajo
+        if self.y > 480:  # Si el emoji se sale de la pantalla, lo reubicamos en la parte superior
+            self.y = 0
+            self.x = random.randint(0, 640)
+
+        # Verificar si el emoji ha excedido su tiempo de vida
+        if time.time() - self.creation_time > self.time_to_live:
+            return False  
+        return True 
+```
+
+Para detectar cuándo debe aparecer el dinero, basta con establecer un umbral de distancia entre los dos puntos centrales de la boca y asignar una probabilidad de que ocurra. De esta manera, podemos determinar el momento en que debe activarse la caída del dinero. A continuación, se muestra un fragmento de código que ilustra cómo se implementa esta lógica:
+
+```python
+ # Umbral para la distancia 
+ threshold = 40 
+
+ probabilidad_generar_emoji = 0.1
+
+ if mouth_open_distance > threshold and random.random() < probabilidad_generar_emoji:
+     if random.random() < 0.4:
+         new_emoji = FallingEmoji(random.randint(0, frame.shape[1] - 80), 0, random.randint(2, 5), time_to_live=5)
+         falling_emoji.append(new_emoji)
+                 
+ # Eliminamos segun va pasando el tiempo de vida
+ falling_emoji[:] = [emoji for emoji in falling_emoji if emoji.update()]
+```
+
+En el modo duende, el tamaño de las orejas varía en función de la distancia del rostro a la cámara: cuanto más cerca esté, mayor será el tamaño de las orejas. Cada oreja se representa mediante una imagen, y tanto su tamaño como su posición se ajustan en función de la ubicación del rostro.
+
+```python
+# Posicionamos las orejas (puntos 234 y 454 para las orejas izquierda y derecha)
+if 234 in points_data:
+    left_ear_position = points_data[234]
+    left_ear_resized = cv2.resize(left_ear_img, (100, 100))  # Ajustamos el tamaño de la oreja izquierda
+    lx, ly = left_ear_position['x'], left_ear_position['y']
+
+    # Ajustes de posición vertical y horizontal
+    lx -= 80  
+    ly -= 60 
+
+# Más abajo en el código...
+
+if 454 in points_data:
+    right_ear_position = points_data[454]
+    right_ear_resized = cv2.resize(right_ear_img, (100, 100))  # Ajustamos el tamaño de la oreja derecha
+    rx, ry = right_ear_position['x'], right_ear_position['y']
+
+    # Ajustes de posición para la oreja derecha
+    rx -= 15  
+    ry -= 60 
+```
+
+Este fragmento de código muestra cómo posicionar las orejas en función de los puntos clave del rostro, con ajustes en el tamaño y la posición para lograr un efecto realista.
+
+### Modo duende adicional(segmentación)
+
+En este caso, el funcionamiento es similar al modo duende anterior, pero se le añade segmentación para que el fondo desaparezca y sea reemplazado por una imagen. Esto amplía el uso de MediaPipe, explorando sus diversas funcionalidades. Para la segmentación, utilizamos un modelo que MediaPipe proporciona en su documentación, el cual nos ayudará a segmentar lo que se reproduce a través de la cámara en vivo.
+
+```python
+# Configurar las opciones del segmentador
+options = vision.ImageSegmenterOptions(
+    base_options=BaseOptions(model_asset_path="models/selfie_segmenter.tflite"), 
+    output_category_mask=True,
+    running_mode=vision.RunningMode.LIVE_STREAM, 
+    result_callback=segmentation_callback
+)
+
+# Creamos el segmentador
+segmenter = vision.ImageSegmenter.create_from_options(options)
+```
+
+Por último, la forma de procesar los frames a partir de la segmentación es la siguiente:
+
+```python
+# Creamos el FaceMesh y procesamos los frames
+with mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5) as face_mesh:
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        # Convertimos el frame a RGB
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame_rgb = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
+
+        # Obtenemos los resultados del segmentador
+        segmenter.segment_async(frame_rgb, time.time_ns() // 1_000_000)
+```
+
+Este código muestra cómo procesar los frames tras la segmentación, utilizando la conversión de los mismos a formato RGB y luego pasándolos al segmentador para obtener los resultados de forma asíncrona.
+
+<div align="center">
+   <img  width="400px" src="images/duende_adicional.gif" >
+</div>
+
+> [!TIP]  
+> MediaPipe ofrece una gran variedad de funcionalidades, desde la detección de rostros hasta la segmentación y mucho más, lo que permite explorar y crear distintos modos animados de filtros para pasar un rato divertido.
 
 ---
 
@@ -65,14 +186,11 @@ Tras mostrar opciones para la detección y extracción de información de caras 
 
 ## 📚 Bibliografía
 
-1. [Opencv](https://docs.opencv.org/4.x/dc/da5/tutorial_py_drawing_functions.html)
-2. [Mondrian](https://www3.gobiernodecanarias.org/medusa/ecoescuela/sa/2017/04/17/descubriendo-a-mondrian/)
-3. [Marilyn POP ART](https://temasycomentariosartepaeg.blogspot.com/p/autor-andy-warhol-1928-1987-titulo.html)
-4. [Online OpenCV Compiler](https://python-fiddle.com/examples/opencv)
-5. [Stackoverflow type np uint8](https://stackoverflow.com/questions/64314899/how-does-numpy-astypenp-uint8-convert-a-float-array-1-2997805-became-255)
-6. [Stackoverflow how to change hue](https://stackoverflow.com/questions/67448555/python-opencv-how-to-change-hue-in-hsv-channels)
-7. [Stackoverflow how to cv2 minmaxloc](https://stackoverflow.com/questions/53292170/how-to-use-the-cv2-minmaxloc-in-template-matching)
-8. [GeeksforGeeks splitting and merging channels](https://www.geeksforgeeks.org/splitting-and-merging-channels-with-python-opencv/)
+1. [Mediapipe](https://github.com/google-ai-edge/mediapipe)
+2. [Image Segmenter - Mediapipe](https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter?hl=es-419)
+3. [Detección de rostros con Mediapipe y Python](https://omes-va.com/deteccion-de-rostros-mediapipe-python/)
+4. [Selfie Segmentation con Mediapipe y Python](https://omes-va.com/mediapipe-selfie-segmentation-python-2/)
+5. [Malla facial con Mediapipe y Python](https://omes-va.com/malla-facial-mediapipe-python/)
 
 ---
 
