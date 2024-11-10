@@ -172,6 +172,149 @@ Este código muestra cómo procesar los frames tras la segmentación, utilizando
    <img  width="400px" src="images/duende_adicional.gif" >
 </div>
 
+### Modo lluvia de hamburguesas
+
+En este modo se tiene continúamente una gorra de un restaurante en la cabeza y cuando se abre la boca se visualiza una lluvia de hamburguesas, cuando las hamburguesas llegan a la parte inferior de la pantalla se resetea su posición a la parte superior. En esta sección del documento se explicará cómo funciona este filtro y también su visualización:
+
+```python
+def apply_hat(frame, face_landmarks):
+    # Utilizamos los puntos 183 y 332 de la malla facial como referencia para la parte superior de la cabeza
+    head_top = (int(face_landmarks.landmark[183].x * frame.shape[1]), 
+                int(face_landmarks.landmark[332].y * frame.shape[0]))
+
+    # Calculamos la posición promedio en Y de los puntos para ajustar mejor el lugar donde se colocará la gorra
+    head_top_avg_y = int((face_landmarks.landmark[183].y + face_landmarks.landmark[332].y) * frame.shape[0] / 2)
+
+    # Obtener los ángulos de rotación de la cabeza
+    angle_horiz, angle_vert = get_head_rotation(face_landmarks)
+    
+    # Aplicar una transformación de rotación a la gorra
+    rotation_matrix = cv2.getRotationMatrix2D((hat_img.shape[1] // 2, hat_img.shape[0] // 2), 
+                                              math.degrees(angle_horiz), 1)  # Rotación en el eje horizontal
+    
+    # Ajustar la posición de la gorra
+    x_offset = head_top[0] - hat_img.shape[1] // 2  # Centrado horizontalmente
+    y_offset = head_top_avg_y - (hat_img.shape[0] // 2)  # Ajuste hacia la parte superior de la cabeza
+    y_offset -= 150  # Desplazamiento hacia arriba para ajustar la gorra sobre la cabeza
+
+    # Asegurarnos de que la gorra no se salga de la imagen
+    frame_height, frame_width = frame.shape[:2]
+    if x_offset < 0: x_offset = 0
+    if y_offset < 0: y_offset = 0
+
+    if x_offset + hat_img.shape[1] > frame_width: x_offset = frame_width - hat_img.shape[1]
+    if y_offset + hat_img.shape[0] > frame_height: y_offset = frame_height - hat_img.shape[0]
+
+    # Verificar que la gorra está dentro de los límites del frame
+    if x_offset + hat_img.shape[1] <= frame_width and y_offset + hat_img.shape[0] <= frame_height:
+        # Obtener la región de interés (ROI) en el frame
+        roi = frame[y_offset:y_offset + hat_img.shape[0], x_offset:x_offset + hat_img.shape[1]]
+        
+        # Rotar la gorra con la matriz de rotación
+        rotated_hat = cv2.warpAffine(hat_img, rotation_matrix, (hat_img.shape[1], hat_img.shape[0]))
+
+        # Asegurarnos de que la gorra tiene un canal alfa para manejar la transparencia
+        for c in range(0, 3):
+            roi[:, :, c] = roi[:, :, c] * (1.0 - rotated_hat[:, :, 3] / 255.0) + \
+                            rotated_hat[:, :, c] * (rotated_hat[:, :, 3] / 255.0)
+
+        # Colocar la gorra rotada en el frame
+        frame[y_offset:y_offset + rotated_hat.shape[0], x_offset:x_offset + rotated_hat.shape[1]] = roi
+```
+
+Esta función superpone una imagen de una gorra sobre la cabeza de una persona en un frame. Utiliza los puntos de referencia faciales para posicionar y rotar la gorra para que se alinee con la orientación de la cabeza detectada.
+
+Pasos detallados:
+
+- Detección de la posición de la cabeza:
+   - Se utilizan los puntos 183 y 332 de la malla facial proporcionada por face_landmarks para calcular la posición superior de la cabeza.
+   - Se calcula la posición promedio en el eje Y de estos puntos para ajustar el lugar donde se colocará la gorra.
+- Cálculo de la rotación de la cabeza:
+   - Se obtiene el ángulo de rotación horizontal y vertical de la cabeza mediante la función get_head_rotation(face_landmarks).
+   - Estos ángulos permiten rotar la gorra de acuerdo con la orientación actual de la cabeza.
+- Ajuste de la posición de la gorra:
+   - Se calcula el desplazamiento en los ejes X e Y para centrar la gorra sobre la cabeza.
+   - Se aplica un ajuste adicional en el eje Y (y_offset -= 150) para posicionar la gorra justo encima de la cabeza.
+- Verificación de límites del fotograma:
+   - Se asegura que la gorra no se salga de los límites del fotograma ajustando los desplazamientos si es necesario.
+- Superposición de la gorra en el fotograma:
+   - Se extrae la región de interés (ROI) del fotograma donde se colocará la gorra.
+   - Se combina la gorra rotada con el ROI utilizando el canal alfa de la gorra para manejar la transparencia.
+- Finalmente, se actualiza el fotograma con el ROI modificado que incluye la gorra.
+
+```python
+def draw_burgers(distance, lip_top, frame):
+    frame_height, frame_width = frame.shape[0], frame.shape[1]
+    
+    if distance > 60:  # Umbral
+        burger_resized = cv2.resize(burger_img, (50, 50))
+        burger_width, burger_height = burger_resized.shape[1], burger_resized.shape[0]
+
+        # Generar nuevas hamburguesas en la parte derecha e izquierda de la cara
+        for i in range(5):  # Número de hamburguesas a mostrar
+            if i >= len(burger_positions):
+                center_x, center_y = frame_width // 2, frame_height // 2  # Coordenadas centrales del frame
+                # Inicializar la posición de las hamburguesas al estilo json
+                burger_positions.append({
+                    "x": center_x + (i - 2) * (burger_width + 20),
+                    "y": center_y - burger_height // 2,
+                    "direction": 1,                    # Dirección hacia abajo
+                    "side": "right"                    # Indicar que es del lado derecho
+                })
+                burger_positions.append({
+                    "x": lip_top[0] - 100 - (i * 80),  # Espaciado entre hamburguesas en el lado izquierdo
+                    "y": -burger_height,               # Comenzar desde la parte superior fuera de la vista
+                    "direction": 1,                    # Dirección hacia abajo
+                    "side": "left"                     # Indicar que es del lado izquierdo
+                })
+            
+            # Actualizamos la posición de las hamburguesas
+            for j in range(len(burger_positions)):
+                burger_positions[j]["y"] += burger_positions[j]["direction"] * 5  # Mover hacia abajo
+                if burger_positions[j]["y"] > frame_height: burger_positions[j]["y"] = burger_height  # Volver a la parte superior
+
+                # Verificar que la hamburguesa no se salga del cuadro
+                x_offset, y_offset  = burger_positions[j]["x"], burger_positions[j]["y"]
+
+                if x_offset + burger_width <= frame_width and y_offset + burger_height <= frame_height:
+                    # Dibujar la hamburguesa en su nueva posición
+                    for c in range(0, 3):
+                        try:
+                            frame[y_offset:y_offset+burger_height, x_offset:x_offset+burger_width, c] = \
+                                burger_resized[:, :, c] * (burger_resized[:, :, 3] / 255.0) + \
+                                frame[y_offset:y_offset+burger_height, x_offset:x_offset+burger_width, c] * \
+                                (1.0 - burger_resized[:, :, 3] / 255.0)
+                        except Exception as e:
+                            continue
+```
+
+Esta función anima imágenes de hamburguesas cayendo desde la parte superior de la pantalla cuando la boca de la persona está abierta más allá de un umbral específico.
+Pasos detallados:
+
+- Verificación del umbral de apertura de la boca:
+   - Si la distancia medida (la apertura de la boca) es mayor que 60, se procede a generar y animar las hamburguesas.
+   - Esta distancia se calcula con los puntos 13, 14, 18 y 19 de la malla facial.
+- Preparación de la imagen de la hamburguesa:
+   - Se redimensiona la imagen de la hamburguesa (burger_img) a 50x50 píxeles.
+   - Se obtienen las dimensiones de la imagen redimensionada para su uso posterior.
+- Generación de posiciones iniciales de las hamburguesas:
+   - Se generan hasta 6 hamburguesas, añadiendo sus posiciones iniciales a la lista burger_positions.
+   - Las hamburguesas se colocan tanto a la derecha como a la izquierda de la cara:
+      - Lado derecho: Posicionadas alrededor del centro del fotograma y espaciadas horizontalmente.
+      - Lado izquierdo: Posicionadas basándose en la posición superior del labio (lip_top), con un espaciado hacia la izquierda.
+- Animación del movimiento de las hamburguesas:
+   - Se actualiza la posición vertical de cada hamburguesa, moviéndolas hacia abajo en el fotograma para simular una caída.
+   - Si una hamburguesa sale del límite inferior del fotograma, su posición se reinicia para continuar la animación.
+- Dibujo de las hamburguesas en el fotograma:
+   - Para cada hamburguesa dentro de los límites del fotograma, se superpone la imagen de la hamburguesa en su posición actual.
+   - Se utiliza el canal alfa de la imagen para manejar la transparencia y asegurar una correcta superposición.
+   - Se emplea manejo de excepciones para evitar interrupciones en caso de errores durante el proceso de dibujo.
+ 
+## Visualización del filtro
+<div align="center">
+   <img  width="400px" src="images/filtro 2.gif" >
+</div>
+
 > [!TIP]  
 > MediaPipe ofrece una gran variedad de funcionalidades, desde la detección de rostros hasta la segmentación y mucho más, lo que permite explorar y crear distintos modos animados de filtros para pasar un rato divertido.
 
