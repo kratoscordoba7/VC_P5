@@ -279,10 +279,10 @@ if 454 in points_data:
 Este fragmento de código muestra cómo posicionar las orejas en función de los puntos clave del rostro, con ajustes en el tamaño y la posición para lograr un efecto realista.
 
 <div align="center">
-<img src="images/primer filtro.gif">
+<img width="400px" src="images/primer filtro.gif">
 </div>
 
-### Modo duende adicional(segmentación)
+### Modo duende adicional(segmentación de fondo)
 
 En este caso, el funcionamiento es similar al modo duende anterior, pero se le añade segmentación para que el fondo desaparezca y sea reemplazado por una imagen. Esto amplía el uso de MediaPipe, explorando sus diversas funcionalidades. Para la segmentación, utilizamos un modelo que MediaPipe proporciona en su documentación, el cual nos ayudará a segmentar lo que se reproduce a través de la cámara en vivo.
 
@@ -325,7 +325,7 @@ Este código muestra cómo procesar los frames tras la segmentación, utilizando
 
 
 
-### Modo "Dios"
+### Modo "Dios" (segmentación de pelo)
 
 En este modo, utilizamos el segmentador de cabello de MediaPipe para detectar y cambiar el color del cabello a blanco, además de añadir un halo adaptado a la posición y tamaño de la cabeza del usuario.
 
@@ -383,7 +383,7 @@ if contours:
 Con esta implementación, obtenemos el efecto visual donde el cabello se muestra en blanco y un halo flotante se ajusta dinámicamente al tamaño y posición de la cabeza.
 
 <div align="center">
-    <img src="images/filtro 3.gif">
+    <img width="400px" src="images/filtro 3.gif">
 </div>
 
 
