@@ -7,7 +7,7 @@ Se han completado todas las tareas solicitadas de la **Práctica 5** para la asi
 
 [![GitHub](https://img.shields.io/badge/GitHub-Heliot%20J.%20Segura%20Gonzalez-darkcyan?style=flat-square&logo=github)](https://github.com/kratoscordoba7)
 
-[![GitHub](https://img.shields.io/badge/GitHub-Alejandro%20David%20Arzola%20Saavedra%20-black?style=flat-square&logo=github)](https://github.com/AlejandroDavidArzolaSaavedra)
+[![GitHub](https://img.shields.io/badge/GitHub-Alejandro%20D.%20Arzola%20Saavedra%20-black?style=flat-square&logo=github)](https://github.com/AlejandroDavidArzolaSaavedra)
 
 ## 🛠️ Librerías Utilizadas
 
