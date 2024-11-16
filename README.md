@@ -278,6 +278,7 @@ if 454 in points_data:
 
 Este fragmento de código muestra cómo posicionar las orejas en función de los puntos clave del rostro, con ajustes en el tamaño y la posición para lograr un efecto realista.
 
+## Visualización del filtro
 <div align="center">
 <img width="400px" src="images/primer filtro.gif">
 </div>
@@ -319,6 +320,7 @@ with mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence
 
 Este código muestra cómo procesar los frames tras la segmentación, utilizando la conversión de los mismos a formato RGB y luego pasándolos al segmentador para obtener los resultados de forma asíncrona.
 
+## Visualización del filtro
 <div align="center">
    <img  width="400px" src="images/duende_adicional.gif" >
 </div>
@@ -382,6 +384,7 @@ if contours:
 
 Con esta implementación, obtenemos el efecto visual donde el cabello se muestra en blanco y un halo flotante se ajusta dinámicamente al tamaño y posición de la cabeza.
 
+## Visualización del filtro
 <div align="center">
     <img width="400px" src="images/filtro 3.gif">
 </div>
@@ -398,7 +401,6 @@ Con esta implementación, obtenemos el efecto visual donde el cabello se muestra
 
 > [!IMPORTANT]  
 > Los archivos presentados aquí son una modificación de los archivos originales de [otsedom](https://github.com/otsedom/otsedom.github.io/tree/main/VC).
-
 
 
 ---
