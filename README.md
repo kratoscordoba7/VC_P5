@@ -390,6 +390,10 @@ Con esta implementación, obtenemos el efecto visual donde el cabello se muestra
 > [!TIP]  
 > MediaPipe ofrece una gran variedad de funcionalidades, desde la detección de rostros hasta la segmentación y mucho más, lo que permite explorar y crear distintos modos animados de filtros para pasar un rato divertido.
 
+
+> [!WARNING] 
+> Los modelos empleados en la carpeta `models` para la segmentación y coloreado del cabello, así como el modelo utilizado para la segmentación del fondo, son parte de Google AI for Developers y están disponibles en el sitio oficial de Google. Puedes encontrarlos en el siguiente enlace: [MediaPipe Image Segmenter](https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter?hl=es-419). 
+
 ---
 
 > [!IMPORTANT]  
